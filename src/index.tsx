@@ -35,42 +35,32 @@ app.get("/webhook", (c) => {
 
   return c.text("Invalid verification token", 401);
 });
-async function sendTypingIndicator(messageId: string, phoneNumberId: string, accessToken: string) {
-  const response = await fetch(`https://graph.facebook.com/v25.0/${phoneNumberId}/messages`, {
-    method: "POST",
-     headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-     body: JSON.stringify({
-      messaging_product: "whatsapp",
-      status: "read",
-      message_id: messageId,
-      typing_indicator: {
-        type: "text",
+
+async function sendTypingIndicator(
+  messageId: string,
+  phoneNumberId: string,
+  accessToken: string,
+) {
+  const response = await fetch(
+    `https://graph.facebook.com/v25.0/${phoneNumberId}/messages`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
-    }),
-  });
-   const data = await response.json();
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        status: "read",
+        message_id: messageId,
+        typing_indicator: {
+          type: "text",
+        },
+      }),
+    },
+  );
+  const data = await response.json();
   return data;
 }
-app.post("/webhook", async (c) => {
-  const { WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID } = env<{
-    WHATSAPP_ACCESS_TOKEN: string;
-    WHATSAPP_PHONE_NUMBER_ID: string;
-  }>(c);
 
-  const body = await c.req.json();
-
-  const message = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-
-  if (!message) {
-    return c.text("EVENT_RECEIVED", 200);
-  }
-  const messageId = message.id;
-
-  await sendTypingIndicator(messageId, WHATSAPP_PHONE_NUMBER_ID, WHATSAPP_ACCESS_TOKEN);
-
-  return c.text("EVENT_RECEIVED", 200);
-});
 export default app;
