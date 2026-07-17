@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "Whatsapp Api server, that implements message webhook and communicates with the model to give answers.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AKITO009/server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AKITO009/server/issues"
+  },
+  "homepage": "https://github.com/AKITO009/server#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
