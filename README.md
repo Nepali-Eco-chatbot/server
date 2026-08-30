@@ -1,2 +1,8 @@
-# server
-Whatsapp Api server, that implements message webhook and communicates with the model to give answers.
+# Nepali Eco Chatbot - Server
+
+WhatsApp chatbot server built with Hono on Cloudflare Workers.
+
+## Setup
+
+npm install
+npm run dev
