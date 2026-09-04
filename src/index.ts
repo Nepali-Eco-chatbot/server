@@ -7,33 +7,32 @@ app.get("/", (c) => {
 	// verification token sent by wp api
 	const verificationToken = c.req.query("hub.verify_token");
 	const challenge = c.req.query("hub.challenge");
-
-	console.log({
-		verificationToken,
-		challenge,
-	});
+	const mode = c.req.query("hub.mode");
 
 	const { META_WP_API_VERIFICATION_TOKEN: server_verification_token } = env<{
 		META_WP_API_VERIFICATION_TOKEN: string;
 	}>(c);
 
-	if (!server_verification_token) {
-		return c.text("Server Env not found", 500);
+	switch (true) {
+		case !server_verification_token: {
+			return c.text("Server Env not found", 500);
+		}
+		case !verificationToken: {
+			return c.text("Meta did not send verification token", 400);
+		}
+		case !challenge: {
+			return c.text("Meta did not send any challenge", 400);
+		}
+		case mode !== "subscribe": {
+			return c.text("Invaild mode provided", 400);
+		}
+		case verificationToken === server_verification_token: {
+			return c.text(challenge, 200);
+		}
+		default: {
+			return c.text("Invalid verification token", 401);
+		}
 	}
-
-	if (!verificationToken) {
-		return c.text("Meta did not send verification token", 400);
-	}
-
-	if (!challenge) {
-		return c.text("Meta did not send any challenge", 400);
-	}
-
-	if (verificationToken === server_verification_token) {
-		return c.text(challenge, 200);
-	}
-
-	return c.text("Invalid verification token", 401);
 });
 
 // async function sendTypingIndicator(messageId: string, phoneNumberId: string, accessToken: string) {

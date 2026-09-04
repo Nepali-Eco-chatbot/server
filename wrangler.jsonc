@@ -12,5 +12,15 @@
 			"invocation_logs": true,
 			"persist": true,
 		},
+		"redact_query_string": false,
 	},
+	"routes": [
+		{
+			"pattern": "webhook.nepaliecochat.bot",
+			"zone_name": "nepaliecochat.bot",
+			"custom_domain": true,
+			"enabled": true,
+			"previews_enabled": false
+		}
+	],
 }
