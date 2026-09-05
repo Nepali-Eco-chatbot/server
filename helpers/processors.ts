@@ -44,6 +44,8 @@ export const processUserQuery = async (c: Context) => {
 			return c.text("No query content found", 200);
 		}
 
+		// to stop meta from resending the post req
+		c.text("EVENT_RECEIVED", 200);
 		sendTypingIndicator({ c, messageId, phoneNumberId });
 
 		const userQueryEmbedding = await new Embedder().embed(userQuery);
