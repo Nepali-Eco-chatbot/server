@@ -61,8 +61,9 @@ export const sendFinalResponse = async ({
 					body: finalResponse,
 				},
 			}),
-		}).then(() => {
+		}).then((res) => {
 			console.log("Final response sent", finalResponse);
+			console.log(JSON.stringify(res, null, 2));
 		});
 	} catch (e) {
 		console.error("Something went wrong while sending typing indicator", e);

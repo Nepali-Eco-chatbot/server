@@ -46,10 +46,10 @@ export const processUserQuery = async (c: Context) => {
 
 		c.executionCtx.waitUntil(
 			(async () => {
-				sendTypingIndicator({ c, messageId, phoneNumberId });
+				// await sendTypingIndicator({ c, messageId, phoneNumberId });
 
-				const userQueryEmbedding = await new Embedder().embed(userQuery);
-				if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
+				// const userQueryEmbedding = await new Embedder().embed(userQuery);
+				// if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
 
 				// might wanna change the loading text here if possible.
 				// const relevantRecords =
