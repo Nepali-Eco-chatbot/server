@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/libsql/node";
+import { drizzle } from "drizzle-orm/libsql/web";
 
 export const db = drizzle({
 	connection: {
