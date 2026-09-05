@@ -1,15 +1,24 @@
 {
-	"name": "server",
-	"type": "module",
-	"scripts": {
-		"dev": "wrangler dev",
-		"deploy": "wrangler deploy"
-	},
-	"dependencies": {
-		"hono": "^4.12.27"
-	},
-	"devDependencies": {
-		"@cloudflare/workers-types": "^5.20260904.1",
-		"wrangler": "^4.17.0"
-	}
+  "name": "server",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^4.0.64",
+    "@huggingface/inference": "^4.13.28",
+    "@huggingface/transformers": "^4.2.0",
+    "@libsql/client": "^0.17.4",
+    "ai": "^7.0.93",
+    "drizzle-orm": "^1.0.0-rc.4",
+    "hono": "^4.12.27",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260904.1",
+    "@types/bun": "^1.4.0",
+    "drizzle-kit": "^1.0.0-rc.4",
+    "wrangler": "^4.17.0"
+  }
 }
