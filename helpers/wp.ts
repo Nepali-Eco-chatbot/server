@@ -36,11 +36,13 @@ export async function sendTypingIndicator({
 export const sendFinalResponse = async ({
 	messageId,
 	phoneNumberId,
+	phoneNumber,
 	finalResponse,
 	c,
 }: {
 	messageId: string;
 	phoneNumberId: string;
+	phoneNumber: string;
 	finalResponse: string;
 	c: Context;
 }) => {
@@ -54,7 +56,8 @@ export const sendFinalResponse = async ({
 			},
 			body: JSON.stringify({
 				messaging_product: "whatsapp",
-				status: "read",
+				recipient_type: "individual",
+				to: phoneNumber,
 				message_id: messageId,
 				text: {
 					preview_url: false,

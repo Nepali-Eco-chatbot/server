@@ -38,15 +38,15 @@ export const verifyWebhook = (c: Context) => {
 
 export const processUserQuery = async (c: Context) => {
 	try {
-		const { userQuery, messageId, phoneNumberId } = await extractUserQuery(c);
+		const { userQuery, messageId, phoneNumberId, fromNumber } = await extractUserQuery(c);
 
-		if (!userQuery || !messageId || !phoneNumberId) {
+		if (!userQuery || !messageId || !phoneNumberId || !fromNumber) {
 			return c.text("No query content found", 200);
 		}
 
 		c.executionCtx.waitUntil(
 			(async () => {
-				// await sendTypingIndicator({ c, messageId, phoneNumberId });
+				sendTypingIndicator({ c, messageId, phoneNumberId });
 
 				// const userQueryEmbedding = await new Embedder().embed(userQuery);
 				// if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
@@ -66,6 +66,7 @@ export const processUserQuery = async (c: Context) => {
 					messageId,
 					phoneNumberId,
 					finalResponse: "WIP: connecting overall project",
+					phoneNumber: fromNumber,
 					c,
 				});
 
