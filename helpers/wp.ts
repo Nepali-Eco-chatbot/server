@@ -56,7 +56,10 @@ export const sendFinalResponse = async ({
 				messaging_product: "whatsapp",
 				status: "read",
 				message_id: messageId,
-				// TODO: Add final response
+				text: {
+					preview_url: false,
+					body: finalResponse,
+				},
 			}),
 		});
 	} catch (e) {

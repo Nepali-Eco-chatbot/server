@@ -23,7 +23,7 @@ export const float32Array = customType<{
  * processed knowledge base
  */
 export const pknw_base = sqliteTable("pknw_base", {
-	rowid: int("rowid").primaryKey(),
+	id: int().primaryKey({ autoIncrement: true }),
 	embedding: float32Array("embedding", {
 		dimensions: 384, // embedding length of the model being used https://huggingface.co/intfloat/multilingual-e5-small
 	}).notNull(),

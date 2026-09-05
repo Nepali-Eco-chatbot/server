@@ -52,20 +52,20 @@ export const processUserQuery = async (c: Context) => {
 				if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
 
 				// might wanna change the loading text here if possible.
-				const relevantRecords =
-					(await getRelevantDBRecords({
-						embedding: userQueryEmbedding,
-					})) ?? [];
+				// const relevantRecords =
+				// 	(await getRelevantDBRecords({
+				// 		embedding: userQueryEmbedding,
+				// 	})) ?? [];
 
-				// might wanna change the loading text here if possible.
-				const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
-				if (!llmResponse)
-					return c.text("Something went wrong while generating response from llm", 500);
+				// // might wanna change the loading text here if possible.
+				// const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
+				// if (!llmResponse)
+				// 	return c.text("Something went wrong while generating response from llm", 500);
 
 				await sendFinalResponse({
 					messageId,
 					phoneNumberId,
-					finalResponse: llmResponse,
+					finalResponse: "WIP: connecting overall project",
 					c,
 				});
 
@@ -73,12 +73,12 @@ export const processUserQuery = async (c: Context) => {
 					{
 						phoneNumberId,
 						userQuery,
-						llmResponse,
 					},
 					200,
 				);
 			})(),
 		);
+
 		return c.text("EVENT_RECEIVED", 200);
 	} catch (error) {
 		console.error("Error handling WhatsApp webhook:", error);
