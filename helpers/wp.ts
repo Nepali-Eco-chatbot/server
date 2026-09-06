@@ -58,15 +58,14 @@ export const sendFinalResponse = async ({
 				messaging_product: "whatsapp",
 				recipient_type: "individual",
 				to: phoneNumber,
-				message_id: messageId,
+				context: {
+					message_id: messageId,
+				},
 				text: {
 					preview_url: false,
 					body: finalResponse,
 				},
 			}),
-		}).then((res) => {
-			console.log("Final response sent", finalResponse);
-			console.log(JSON.stringify(res, null, 2));
 		});
 	} catch (e) {
 		console.error("Something went wrong while sending typing indicator", e);

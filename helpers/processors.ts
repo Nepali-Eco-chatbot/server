@@ -61,12 +61,12 @@ export const processUserQuery = async (c: Context) => {
 				// const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
 				// if (!llmResponse)
 				// 	return c.text("Something went wrong while generating response from llm", 500);
-
+				//
 				await sendFinalResponse({
 					messageId,
 					phoneNumberId,
-					finalResponse: "WIP: connecting overall project",
-					phoneNumber: fromNumber,
+					finalResponse: `Hello there! 👋\nThank you for messaging us!!! \nWe are currently in development, we have noted your query and will respond as soon as we get fully integrated.`,
+					phoneNumber: phoneNumberId,
 					c,
 				});
 
@@ -115,7 +115,7 @@ const extractUserQuery = async (
 	}
 
 	const messageId = message.id;
-	const fromNumber = message.from!;
+	const fromNumber = message.from_user_id!;
 	const phoneNumberId = value?.metadata?.phone_number_id;
 
 	// Extract user query based on message type
