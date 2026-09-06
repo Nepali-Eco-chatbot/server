@@ -44,6 +44,9 @@ export const processUserQuery = async (c: Context) => {
 			return c.text("No query content found", 200);
 		}
 
+		const json = await c.req.json();
+		console.log(JSON.stringify(json, null, 2));
+
 		c.executionCtx.waitUntil(
 			(async () => {
 				sendTypingIndicator({ c, messageId, phoneNumberId });
@@ -66,7 +69,7 @@ export const processUserQuery = async (c: Context) => {
 					messageId,
 					phoneNumberId,
 					finalResponse: `Hello there! 👋\nThank you for messaging us!!! \nWe are currently in development, we have noted your query and will respond as soon as we get fully integrated.`,
-					phoneNumber: phoneNumberId,
+					phoneNumber: fromNumber,
 					c,
 				});
 
@@ -115,7 +118,7 @@ const extractUserQuery = async (
 	}
 
 	const messageId = message.id;
-	const fromNumber = message.from_user_id!;
+	const fromNumber = message.from!;
 	const phoneNumberId = value?.metadata?.phone_number_id;
 
 	// Extract user query based on message type

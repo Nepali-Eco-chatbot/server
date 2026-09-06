@@ -29,6 +29,9 @@ export async function sendTypingIndicator({
 			}),
 		});
 	} catch (e) {
+		console.log({
+			err: JSON.stringify(e, null, 2),
+		});
 		console.error("Something went wrong while sending typing indicator", e);
 	}
 }
@@ -36,14 +39,14 @@ export async function sendTypingIndicator({
 export const sendFinalResponse = async ({
 	messageId,
 	phoneNumberId,
-	phoneNumber,
 	finalResponse,
+	phoneNumber,
 	c,
 }: {
 	messageId: string;
 	phoneNumberId: string;
-	phoneNumber: string;
 	finalResponse: string;
+	phoneNumber: string;
 	c: Context;
 }) => {
 	const { ACCESS_TOKEN } = env<TEnv>(c);
@@ -66,6 +69,13 @@ export const sendFinalResponse = async ({
 					body: finalResponse,
 				},
 			}),
+		}).then((res) => {
+			console.log({
+				res: JSON.stringify(res, null, 2),
+				messageId,
+				phoneNumberId,
+				finalResponse,
+			});
 		});
 	} catch (e) {
 		console.error("Something went wrong while sending typing indicator", e);

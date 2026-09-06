@@ -17,6 +17,7 @@ export interface WhatsAppWebhookBody {
 					wa_id?: string;
 				}>;
 				messages?: Array<{
+					from: string;
 					from_user_id?: string;
 					id?: string;
 					timestamp?: string;
