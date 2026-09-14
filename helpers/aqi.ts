@@ -110,7 +110,7 @@ async function fetchWAQIData(lat: number, lon: number) {
 async function fetchOpenAQData(lat: number, lon: number) {
 	try {
 		const res = await fetch(
-			`https://api.openaq.org/v2/latest?coordinates=${lat},${lon}&radius=15000&limit=1&order_by=lastUpdated&sort=desc`
+			`https://api.openaq.org/v2/latest?coordinates=${lat},${lon}&radius=25000&limit=1&order_by=lastUpdated&sort=desc`
 		);
 		const data = await res.json();
 		if (!data.results?.length) return null;
@@ -197,9 +197,9 @@ export async function fetchAQIAndWeatherData(location: string) {
 
 	// Try sources in priority order: WAQI (real stations) → OpenAQ (govt) → Open-Meteo (model)
 	const sources = await Promise.allSettled([
-		fetchWAQIData(city.lat, city.lon),
-		fetchOpenAQData(city.lat, city.lon),
-		fetchOpenMeteoData(city.lat, city.lon),
+		fetchOpenAQData(city.lat, city.lon),      // Primary: govt stations with radius filtering
+		fetchWAQIData(city.lat, city.lon),        // Secondary: WAQI (validated for Nepal)
+		fetchOpenMeteoData(city.lat, city.lon),   // Fallback: model data
 	]);
 
 	let data: any = null;
