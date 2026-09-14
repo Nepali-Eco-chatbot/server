@@ -2,6 +2,7 @@
   "name": "server",
   "type": "module",
   "scripts": {
+     "build": "echo Skipping build - wrangler deploy handles bundling",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy-and-tail": "wrangler deploy && wrangler tail",
