@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-		"deploy-and-tail": "wrangler deploy && wrangler tail",
+    "deploy-and-tail": "wrangler deploy && wrangler tail",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -19,6 +19,10 @@
     "@cloudflare/workers-types": "^5.20260904.1",
     "@types/bun": "^1.4.0",
     "drizzle-kit": "^1.0.0-rc.4",
-    "wrangler": "^4.17.0"
+    "wrangler": "^4.131.2"
+  },
+  "allowScripts": {
+    "workerd@1.20260911.1": true,
+    "esbuild@0.25.12": true
   }
 }
