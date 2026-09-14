@@ -50,56 +50,55 @@ export const processUserQuery = async (c: Context) => {
 			return c.text("No query content found", 200);
 		}
 
-		const json = await c.req.json();
-		console.log(JSON.stringify(json, null, 2));
-
-		console.log("Processed", {
+		console.log("Processed query:", {
 			userQuery,
 			messageId,
 			phoneNumberId,
 			fromNumber,
 		});
 
-		// TODO: Implement cloudflare queue worker
+		const { GOOGLE_GENERATIVE_AI_API_KEY, HF_TOKEN } = env<TEnv>(c);
+
 		c.executionCtx.waitUntil(
 			(async () => {
-				sendTypingIndicator({ c, messageId, phoneNumberId });
+				try {
+					await sendTypingIndicator({ c, messageId, phoneNumberId });
 
-				const userQueryEmbedding = await new Embedder().embed(userQuery);
-				console.log(JSON.stringify(userQueryEmbedding, null, 2));
+					const userQueryEmbedding = await new Embedder(HF_TOKEN).embed(userQuery);
 
-				if (!userQueryEmbedding) return c.text("Error while generating embedding", 500);
+					if (!userQueryEmbedding) {
+						console.error("Error while generating embedding for query:", userQuery);
+						return;
+					}
 
-				// might wanna change the loading text here if possible.
-				const relevantRecords =
-					(await getRelevantDBRecords({
-						embedding: userQueryEmbedding,
-					})) ?? [];
+					const relevantRecords =
+						(await getRelevantDBRecords({
+							embedding: userQueryEmbedding,
+						})) ?? [];
 
-				console.log(JSON.stringify(relevantRecords, null, 2));
+					console.log(`Retrieved ${relevantRecords.length} relevant DB records`);
 
-				// might wanna change the loading text here if possible.
-				const llmResponse = await generateLLMResponse({ relevantRecords, userQuery });
-				console.log(JSON.stringify(llmResponse, null, 2));
-
-				if (!llmResponse)
-					return c.text("Something went wrong while generating response from llm", 500);
-
-				await sendFinalResponse({
-					messageId,
-					phoneNumberId,
-					finalResponse: llmResponse,
-					phoneNumber: fromNumber,
-					c,
-				});
-
-				return c.json(
-					{
-						phoneNumberId,
+					const llmResponse = await generateLLMResponse({
+						relevantRecords,
 						userQuery,
-					},
-					200,
-				);
+						apiKey: GOOGLE_GENERATIVE_AI_API_KEY,
+					});
+
+					if (!llmResponse) {
+						console.error("Something went wrong while generating response from LLM");
+						return;
+					}
+
+					await sendFinalResponse({
+						messageId,
+						phoneNumberId,
+						finalResponse: llmResponse,
+						phoneNumber: fromNumber,
+						c,
+					});
+				} catch (err) {
+					console.error("Error in waitUntil background task:", err);
+				}
 			})(),
 		);
 
