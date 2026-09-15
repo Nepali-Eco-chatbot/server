@@ -19,15 +19,15 @@ export const generateLLMResponse = async ({
 	const formattedChunks =
 		relevantRecords.length > 0
 			? relevantRecords
-					.map(
-						(record, index) =>
-							`[chunk ${index + 1}]:
+				.map(
+					(record, index) =>
+						`[chunk ${index + 1}]:
   content: ${record.content}
   document_title: ${record.document_title}
   document_description: ${record.description}
   document: ${record.link}`,
-					)
-					.join("\n--\n")
+				)
+				.join("\n--\n")
 			: "No reference documents available.";
 
 	const userMessage = `USER QUERY:
@@ -39,14 +39,7 @@ REFERENCE DOCUMENTS (use only for ecology/conservation questions, NOT for AQI or
 ${formattedChunks}
 
 IMPORTANT: If you use the getLiveAQIAndWeather tool, you MUST provide a final response to the user after receiving the tool results.
-
-CRITICAL: At the end of your response, ALWAYS include a "Data Source" line showing:
-- Source: [waqi/openaq/open-meteo] (from the tool result)
-- Station: [station name from tool result]
-- Last Updated: [timestamp from tool result]
-
-Example format:
-"Data Source: WAQI (Station: Ratnapark, Kathmandu) | Updated: 2026-09-14T10:30:00Z"`;
+`;
 
 	// Try only the fastest model first
 	const modelName = "gemini-3.5-flash-lite";
@@ -67,7 +60,7 @@ Example format:
 			`[LLM] Done: toolCalls=${result.toolCalls?.length ?? 0}` +
 			` toolResults=${result.toolResults?.length ?? 0}` +
 			` finishReason=${result.finishReason}` +
-			` text="${result.text?.slice(0, 120)}"`
+			` text="${result.text?.slice(0, 120)}"`,
 		);
 
 		if (result.text && result.text.trim().length > 0) {
@@ -87,14 +80,7 @@ LIVE ENVIRONMENTAL DATA (just fetched in real-time):
 ${liveData}
 
 Answer the user's query accurately and concisely using the live data above.
-
-CRITICAL: At the end of your response, ALWAYS include a "Data Source" line showing:
-- Source: [waqi/openaq/open-meteo] (from the tool result)
-- Station: [station name from tool result]
-- Last Updated: [timestamp from tool result]
-
-Example format:
-"Data Source: WAQI (Station: Ratnapark, Kathmandu) | Updated: 2026-09-14T10:30:00Z"`;
+`;
 
 			const step2 = await generateText({
 				model,

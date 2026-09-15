@@ -46,27 +46,32 @@ function getAQICategory(usAqi: number): { category: string; advice: string } {
 	} else if (usAqi <= 100) {
 		return {
 			category: "Moderate (मध्यम)",
-			advice: "Air quality is acceptable. Sensitive individuals should consider limiting prolonged outdoor exertion.",
+			advice:
+				"Air quality is acceptable. Sensitive individuals should consider limiting prolonged outdoor exertion.",
 		};
 	} else if (usAqi <= 150) {
 		return {
 			category: "Unhealthy for Sensitive Groups (संवेदनशील समूहका लागि अस्वस्थ)",
-			advice: "Members of sensitive groups (children, elderly, asthmatics) may experience health effects. General public is less likely to be affected.",
+			advice:
+				"Members of sensitive groups (children, elderly, asthmatics) may experience health effects. General public is less likely to be affected.",
 		};
 	} else if (usAqi <= 200) {
 		return {
 			category: "Unhealthy (अस्वस्थ)",
-			advice: "Everyone may begin to experience health effects. Wearing masks and avoiding outdoor activities is recommended.",
+			advice:
+				"Everyone may begin to experience health effects. Wearing masks and avoiding outdoor activities is recommended.",
 		};
 	} else if (usAqi <= 300) {
 		return {
 			category: "Very Unhealthy (धेरै अस्वस्थ)",
-			advice: "Health alert: everyone may experience more serious health effects. Stay indoors and use air purifiers if available.",
+			advice:
+				"Health alert: everyone may experience more serious health effects. Stay indoors and use air purifiers if available.",
 		};
 	} else {
 		return {
 			category: "Hazardous (खतरनाक)",
-			advice: "Emergency conditions: entire population is more likely to be affected. Avoid all outdoor activity.",
+			advice:
+				"Emergency conditions: entire population is more likely to be affected. Avoid all outdoor activity.",
 		};
 	}
 }
@@ -80,8 +85,11 @@ async function fetchWAQIData(lat: number, lon: number) {
 
 		const stationName = data.data.city?.name || "";
 		// Validate station is in Nepal (WAQI geo finds nearest globally)
-		const isNepalStation = /nepal|kathmandu|pokhara|biratnagar|birgunj|dharan|bharatpur|hetauda|butwal|janakpur|nepalgunj|birendranagar|dhangadhi|mahendranagar|tulsipur|gorkha|hetauda|bhaktapur|lalitpur|patan|kirtipur|madhyapur|thimi|suryabinayak|changunarayan|dakshinkali|kageshwari|manohara|nagarjun|shankharapur|tokha|budhanilkantha|chandragiri|dakshinkali|kirtipur|nagarjun|shankharapur|tokha/i.test(stationName);
-		
+		const isNepalStation =
+			/nepal|kathmandu|pokhara|biratnagar|birgunj|dharan|bharatpur|hetauda|butwal|janakpur|nepalgunj|birendranagar|dhangadhi|mahendranagar|tulsipur|gorkha|hetauda|bhaktapur|lalitpur|patan|kirtipur|madhyapur|thimi|suryabinayak|changunarayan|dakshinkali|kageshwari|manohara|nagarjun|shankharapur|tokha|budhanilkantha|chandragiri|dakshinkali|kirtipur|nagarjun|shankharapur|tokha/i.test(
+				stationName,
+			);
+
 		if (!isNepalStation) {
 			console.log(`[WAQI] Skipping non-Nepal station: ${stationName}`);
 			return null;
@@ -110,7 +118,7 @@ async function fetchWAQIData(lat: number, lon: number) {
 async function fetchOpenAQData(lat: number, lon: number) {
 	try {
 		const res = await fetch(
-			`https://api.openaq.org/v2/latest?coordinates=${lat},${lon}&radius=25000&limit=1&order_by=lastUpdated&sort=desc`
+			`https://api.openaq.org/v2/latest?coordinates=${lat},${lon}&radius=25000&limit=1&order_by=lastUpdated&sort=desc`,
 		);
 		const data = await res.json();
 		if (!data.results?.length) return null;
@@ -118,7 +126,14 @@ async function fetchOpenAQData(lat: number, lon: number) {
 		const measurements = data.results[0].measurements || {};
 		const getVal = (param: string) => measurements.find((m: any) => m.parameter === param)?.value;
 
-		const usAqi = calculateUSAQI(getVal("pm25"), getVal("pm10"), getVal("o3"), getVal("no2"), getVal("so2"), getVal("co"));
+		const usAqi = calculateUSAQI(
+			getVal("pm25"),
+			getVal("pm10"),
+			getVal("o3"),
+			getVal("no2"),
+			getVal("so2"),
+			getVal("co"),
+		);
 
 		return {
 			source: "openaq",
@@ -137,7 +152,14 @@ async function fetchOpenAQData(lat: number, lon: number) {
 	}
 }
 
-function calculateUSAQI(pm25?: number, pm10?: number, o3?: number, no2?: number, so2?: number, co?: number): number {
+function calculateUSAQI(
+	pm25?: number,
+	pm10?: number,
+	o3?: number,
+	no2?: number,
+	so2?: number,
+	co?: number,
+): number {
 	const breakpoints = [
 		{ cLow: 0, cHigh: 12.0, iLow: 0, iHigh: 50 },
 		{ cLow: 12.1, cHigh: 35.4, iLow: 51, iHigh: 100 },
@@ -156,16 +178,29 @@ function calculateUSAQI(pm25?: number, pm10?: number, o3?: number, no2?: number,
 	};
 	const subIndices = [
 		pm25 ? calc(pm25, breakpoints) : 0,
-		pm10 ? calc(pm10, [{ cLow: 0, cHigh: 54, iLow: 0, iHigh: 50 }, { cLow: 55, cHigh: 154, iLow: 51, iHigh: 100 }, { cLow: 155, cHigh: 254, iLow: 101, iHigh: 150 }, { cLow: 255, cHigh: 354, iLow: 151, iHigh: 200 }, { cLow: 355, cHigh: 424, iLow: 201, iHigh: 300 }, { cLow: 425, cHigh: 604, iLow: 301, iHigh: 500 }]) : 0,
-	].filter(v => v > 0);
+		pm10
+			? calc(pm10, [
+				{ cLow: 0, cHigh: 54, iLow: 0, iHigh: 50 },
+				{ cLow: 55, cHigh: 154, iLow: 51, iHigh: 100 },
+				{ cLow: 155, cHigh: 254, iLow: 101, iHigh: 150 },
+				{ cLow: 255, cHigh: 354, iLow: 151, iHigh: 200 },
+				{ cLow: 355, cHigh: 424, iLow: 201, iHigh: 300 },
+				{ cLow: 425, cHigh: 604, iLow: 301, iHigh: 500 },
+			])
+			: 0,
+	].filter((v) => v > 0);
 	return subIndices.length ? Math.round(Math.max(...subIndices)) : 0;
 }
 
 async function fetchOpenMeteoData(lat: number, lon: number) {
 	try {
 		const [aqiRes, weatherRes] = await Promise.all([
-			fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone`),
-			fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`),
+			fetch(
+				`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone`,
+			),
+			fetch(
+				`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`,
+			),
 		]);
 		if (!aqiRes.ok || !weatherRes.ok) return null;
 
@@ -197,9 +232,9 @@ export async function fetchAQIAndWeatherData(location: string) {
 
 	// Try sources in priority order: WAQI (real stations) → OpenAQ (govt) → Open-Meteo (model)
 	const sources = await Promise.allSettled([
-		fetchOpenAQData(city.lat, city.lon),      // Primary: govt stations with radius filtering
-		fetchWAQIData(city.lat, city.lon),        // Secondary: WAQI (validated for Nepal)
-		fetchOpenMeteoData(city.lat, city.lon),   // Fallback: model data
+		fetchOpenAQData(city.lat, city.lon), // Primary: govt stations with radius filtering
+		fetchWAQIData(city.lat, city.lon), // Secondary: WAQI (validated for Nepal)
+		fetchOpenMeteoData(city.lat, city.lon), // Fallback: model data
 	]);
 
 	let data: any = null;
@@ -224,7 +259,9 @@ export async function fetchAQIAndWeatherData(location: string) {
 	let weather = data;
 	if (sourceUsed !== "open-meteo") {
 		try {
-			const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`);
+			const weatherRes = await fetch(
+				`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`,
+			);
 			const w = await weatherRes.json();
 			weather = {
 				...data,
@@ -233,7 +270,12 @@ export async function fetchAQIAndWeatherData(location: string) {
 				wind_speed_kmh: w?.current?.wind_speed_10m ?? 0,
 			};
 		} catch {
-			weather = { ...data, temperature_celsius: 0, relative_humidity_percent: 0, wind_speed_kmh: 0 };
+			weather = {
+				...data,
+				temperature_celsius: 0,
+				relative_humidity_percent: 0,
+				wind_speed_kmh: 0,
+			};
 		}
 	}
 
@@ -277,7 +319,7 @@ Data Sources (tried in order):
 2. OpenAQ - Government monitoring stations
 3. Open-Meteo - Atmospheric model (fallback)
 
-Returns: us_aqi, status_category, health_advice, pm2_5, pm10, no2, co, o3, so2, temperature_celsius, relative_humidity_percent, wind_speed_kmh, data_source, station, timestamp.
+Returns: us_aqi, status_category, health_advice, pm2_5, pm10, no2, co, o3, so2, temperature_celsius, relative_humidity_percent, wind_speed_kmh, data_source.
 `.trim(),
 	parameters: z.object({
 		location: z
