@@ -39,35 +39,75 @@ export const verifyWebhook = (c: Context) => {
 // --- post
 // --- 1-2s received. 200
 // --- cloudflare queue. -> process this req.
-// --- generates a new worker to work on this task.
+// 	--- generates a new worker to work on this task.
 // --- end
 
-// T Implementation cloudflare queue worker
 export const processUserQuery = async (c: Context) => {
-    try {
-        const { userQuery, messageId, phoneNumberId, fromNumber } = await extractUserQuery(c);
+	try {
+		const { userQuery, messageId, phoneNumberId, fromNumber } = await extractUserQuery(c);
 
-        if (!userQuery || !messageId || !phoneNumberId || !fromNumber) {
-            return c.text("No query content found", 200);
-        }
+		if (!userQuery || !messageId || !phoneNumberId || !fromNumber) {
+			return c.text("No query content found", 200);
+		}
 
-        // Cloudflare Queue Producer 
-        const { WHATSAPP_QUEUE } = env<TEnv>(c);
-        await WHATSAPP_QUEUE.send({
-            userQuery,
-            messageId,
-            phoneNumberId,
-            fromNumber,
-        });
+		console.log("Processed query:", {
+			userQuery,
+			messageId,
+			phoneNumberId,
+			fromNumber,
+		});
 
-        // Immediate 200 OK to Meta
-        return c.text("EVENT_RECEIVED", 200);
-    } catch (error) {
-        console.error("Error handling WhatsApp webhook:", error);
-        return c.text("Internal Server Error", 500);
-    }
+		const { GOOGLE_GENERATIVE_AI_API_KEY, HF_TOKEN } = env<TEnv>(c);
+
+		c.executionCtx.waitUntil(
+			(async () => {
+				try {
+					await sendTypingIndicator({ c, messageId, phoneNumberId });
+
+					const userQueryEmbedding = await new Embedder(HF_TOKEN).embed(userQuery);
+
+					if (!userQueryEmbedding) {
+						console.error("Error while generating embedding for query:", userQuery);
+						return;
+					}
+
+					const relevantRecords =
+						(await getRelevantDBRecords({
+							embedding: userQueryEmbedding,
+						})) ?? [];
+
+					console.log(`Retrieved ${relevantRecords.length} relevant DB records`);
+
+					const llmResponse = await generateLLMResponse({
+						relevantRecords,
+						userQuery,
+						apiKey: GOOGLE_GENERATIVE_AI_API_KEY,
+					});
+
+					if (!llmResponse) {
+						console.error("Something went wrong while generating response from LLM");
+						return;
+					}
+
+					await sendFinalResponse({
+						messageId,
+						phoneNumberId,
+						finalResponse: llmResponse,
+						phoneNumber: fromNumber,
+						c,
+					});
+				} catch (err) {
+					console.error("Error in waitUntil background task:", err);
+				}
+			})(),
+		);
+
+		return c.text("EVENT_RECEIVED", 200);
+	} catch (error) {
+		console.error("Error handling WhatsApp webhook:", error);
+		return c.text("Internal Server Error", 500);
+	}
 };
-
 
 const extractUserQuery = async (
 	c: Context,

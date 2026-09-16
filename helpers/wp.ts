@@ -1,81 +1,83 @@
+import { env } from "hono/adapter";
 import { TEnv } from "../types";
+import { Context } from "hono";
 
 export async function sendTypingIndicator({
-    messageId,
-    phoneNumberId,
-    env,
+	messageId,
+	phoneNumberId,
+	c,
 }: {
-    messageId: string;
-    phoneNumberId: string;
-    env: TEnv;
+	messageId: string;
+	phoneNumberId: string;
+	c: Context;
 }) {
-    const { ACCESS_TOKEN } = env;
-    try {
-        await fetch(`https://graph.facebook.com/v25.0/${phoneNumberId}/messages`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                status: "read",
-                message_id: messageId,
-                typing_indicator: {
-                    type: "text",
-                },
-            }),
-        });
-    } catch (e) {
-        console.log({
-            err: JSON.stringify(e, null, 2),
-        });
-        console.error("Something went wrong while sending typing indicator", e);
-    }
+	const { ACCESS_TOKEN } = env<TEnv>(c);
+	try {
+		await fetch(`https://graph.facebook.com/v25.0/${phoneNumberId}/messages`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${ACCESS_TOKEN}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				messaging_product: "whatsapp",
+				status: "read",
+				message_id: messageId,
+				typing_indicator: {
+					type: "text",
+				},
+			}),
+		});
+	} catch (e) {
+		console.log({
+			err: JSON.stringify(e, null, 2),
+		});
+		console.error("Something went wrong while sending typing indicator", e);
+	}
 }
 
 export const sendFinalResponse = async ({
-    messageId,
-    phoneNumberId,
-    finalResponse,
-    phoneNumber,
-    env,
+	messageId,
+	phoneNumberId,
+	finalResponse,
+	phoneNumber,
+	c,
 }: {
-    messageId: string;
-    phoneNumberId: string;
-    finalResponse: string;
-    phoneNumber: string;
-    env: TEnv;
+	messageId: string;
+	phoneNumberId: string;
+	finalResponse: string;
+	phoneNumber: string;
+	c: Context;
 }) => {
-    const { ACCESS_TOKEN } = env;
-    try {
-        await fetch(`https://graph.facebook.com/v25.0/${phoneNumberId}/messages`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${ACCESS_TOKEN}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                recipient_type: "individual",
-                to: phoneNumber,
-                context: {
-                    message_id: messageId,
-                },
-                text: {
-                    preview_url: false,
-                    body: finalResponse,
-                },
-            }),
-        }).then((res) => {
-            console.log({
-                res: JSON.stringify(res, null, 2),
-                messageId,
-                phoneNumberId,
-                finalResponse,
-            });
-        });
-    } catch (e) {
-        console.error("Something went wrong while sending typing indicator", e);
-    }
+	const { ACCESS_TOKEN } = env<TEnv>(c);
+	try {
+		await fetch(`https://graph.facebook.com/v25.0/${phoneNumberId}/messages`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${ACCESS_TOKEN}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				messaging_product: "whatsapp",
+				recipient_type: "individual",
+				to: phoneNumber,
+				context: {
+					message_id: messageId,
+				},
+				text: {
+					preview_url: false,
+					body: finalResponse,
+				},
+			}),
+		}).then((res) => {
+			console.log({
+				res: JSON.stringify(res, null, 2),
+				messageId,
+				phoneNumberId,
+				finalResponse,
+			});
+		});
+	} catch (e) {
+		console.error("Something went wrong while sending typing indicator", e);
+	}
 };

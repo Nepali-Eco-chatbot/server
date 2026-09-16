@@ -1,8 +1,10 @@
 import { FeatureExtractionOutput, InferenceClient } from "@huggingface/inference";
 
 export class Embedder {
-	client = new InferenceClient(process.env.HF_TOKEN);
-	constructor() { }
+	client: InferenceClient;
+	constructor(token?: string) {
+		this.client = new InferenceClient(token || process.env.HF_TOKEN);
+	}
 
 	embed = async (chunk: string): Promise<FeatureExtractionOutput | undefined> => {
 		try {

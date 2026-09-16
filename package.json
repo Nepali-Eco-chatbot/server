@@ -14,7 +14,8 @@
     "@libsql/client": "^0.18.0",
     "ai": "^7.0.93",
     "drizzle-orm": "^1.0.0-rc.4",
-    "hono": "^4.12.27"
+    "hono": "^4.12.27",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260904.1",
