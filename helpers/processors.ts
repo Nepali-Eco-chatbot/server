@@ -6,6 +6,21 @@ import { Embedder } from "./embedder";
 import { getRelevantDBRecords } from "./db";
 import { generateLLMResponse } from "./llm";
 
+const cleanMarkdown = (text: string): string =>
+	text
+		.replace(/\*\*\*.*?\*\*\*/g, (m) => `*${m.slice(3, -3)}*`)
+		.replace(/\*\*.*?\*\*/g, (m) => `*${m.slice(2, -2)}*`)
+		.replace(/`{1,3}(.*?)`{1,3}/g, "$1")
+		.replace(/^#{1,6}\s+/gm, "")
+		.replace(/━+/g, "")
+		.replace(/—+/g, "-")
+		.replace(/•+/g, "-")
+		.replace(/●+/g, "-")
+		.replace(/>\s+/g, "")
+		.replace(/^\s*:::\s*.*$/gm, "")
+		.replace(/\n{3,}/g, "\n\n")
+		.trim();
+
 export const verifyWebhook = (c: Context) => {
 	// verification token sent by wp api
 	const verificationToken = c.req.query("hub.verify_token");
@@ -35,12 +50,6 @@ export const verifyWebhook = (c: Context) => {
 		}
 	}
 };
-
-// --- post
-// --- 1-2s received. 200
-// --- cloudflare queue. -> process this req.
-// 	--- generates a new worker to work on this task.
-// --- end
 
 export const processUserQuery = async (c: Context) => {
 	try {
@@ -92,7 +101,7 @@ export const processUserQuery = async (c: Context) => {
 					await sendFinalResponse({
 						messageId,
 						phoneNumberId,
-						finalResponse: llmResponse,
+						finalResponse: cleanMarkdown(llmResponse),
 						phoneNumber: fromNumber,
 						c,
 					});
