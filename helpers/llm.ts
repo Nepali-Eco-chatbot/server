@@ -19,15 +19,12 @@ export const generateLLMResponse = async ({
 	const formattedChunks =
 		relevantRecords.length > 0
 			? relevantRecords
-				.map(
-					(record, index) =>
-						`[chunk ${index + 1}]:
-  content: ${record.content}
-  document_title: ${record.document_title}
-  document_description: ${record.description}
-  document: ${record.link}`,
-				)
-				.join("\n--\n")
+					.map(
+						(record, index) =>
+							`[chunk ${index + 1}]:
+  content: ${record.content}`,
+					)
+					.join("\n--\n")
 			: "No reference documents available.";
 
 	const userMessage = `USER QUERY:
@@ -38,8 +35,7 @@ ${userQuery}
 REFERENCE DOCUMENTS (use only for ecology/conservation questions, NOT for AQI or weather):
 ${formattedChunks}
 
-IMPORTANT: If you use the getLiveAQIAndWeather tool, you MUST provide a final response to the user after receiving the tool results.
-`;
+IMPORTANT: If you use the getLiveAQIAndWeather tool, you MUST provide a final response to the user after receiving the tool results.`;
 
 	// Try only the fastest model first
 	const modelName = "gemini-3.5-flash-lite";
@@ -60,7 +56,7 @@ IMPORTANT: If you use the getLiveAQIAndWeather tool, you MUST provide a final re
 			`[LLM] Done: toolCalls=${result.toolCalls?.length ?? 0}` +
 			` toolResults=${result.toolResults?.length ?? 0}` +
 			` finishReason=${result.finishReason}` +
-			` text="${result.text?.slice(0, 120)}"`,
+			` text="${result.text?.slice(0, 120)}"`
 		);
 
 		if (result.text && result.text.trim().length > 0) {
@@ -79,8 +75,7 @@ IMPORTANT: If you use the getLiveAQIAndWeather tool, you MUST provide a final re
 LIVE ENVIRONMENTAL DATA (just fetched in real-time):
 ${liveData}
 
-Answer the user's query accurately and concisely using the live data above.
-`;
+Answer the user's query accurately and concisely using the live data above.`;
 
 			const step2 = await generateText({
 				model,
