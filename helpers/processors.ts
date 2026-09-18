@@ -73,19 +73,26 @@ export const processUserQuery = async (c: Context) => {
 				try {
 					await sendTypingIndicator({ c, messageId, phoneNumberId });
 
-					const userQueryEmbedding = await new Embedder(HF_TOKEN).embed(userQuery);
+					const isAQIQuery = isAirQualityQuery(userQuery);
+					let relevantRecords: NonNullable<Awaited<ReturnType<typeof getRelevantDBRecords>>> = [];
 
-					if (!userQueryEmbedding) {
-						console.error("Error while generating embedding for query:", userQuery);
-						return;
+					if (isAQIQuery) {
+						console.log("Air quality/weather query detected — skipping RAG chunk generation");
+					} else {
+						const userQueryEmbedding = await new Embedder(HF_TOKEN).embed(userQuery);
+
+						if (!userQueryEmbedding) {
+							console.error("Error while generating embedding for query:", userQuery);
+							return;
+						}
+
+						relevantRecords =
+							(await getRelevantDBRecords({
+								embedding: userQueryEmbedding,
+							})) ?? [];
+
+						console.log(`Retrieved ${relevantRecords.length} relevant DB records`);
 					}
-
-					const relevantRecords =
-						(await getRelevantDBRecords({
-							embedding: userQueryEmbedding,
-						})) ?? [];
-
-					console.log(`Retrieved ${relevantRecords.length} relevant DB records`);
 
 					const llmResponse = await generateLLMResponse({
 						relevantRecords,
@@ -117,6 +124,11 @@ export const processUserQuery = async (c: Context) => {
 		return c.text("Internal Server Error", 500);
 	}
 };
+
+const isAirQualityQuery = (query: string): boolean =>
+	/(air quality|aqi|air pollution|pollution|smog|dust|haze|smoke|fog|pm2[.\s]?5|pm10|particulate|weather|forecast|mausam|hawa|hawapani|taapkram|temperature|humidity|wind|visibility|breathe|breathing|mask|go outside|go out|हावा|हावापानी|मौसम|तापक्रम|वायु|प्रदूषण)/i.test(
+		query,
+	);
 
 const extractUserQuery = async (
 	c: Context,

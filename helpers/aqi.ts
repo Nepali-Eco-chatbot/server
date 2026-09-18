@@ -239,18 +239,23 @@ export async function fetchAQIAndWeatherData(location: string) {
 
 export const getLiveAQIAndWeather = tool({
 	description: `
-Fetches real-time, live Air Quality Index (AQI) and weather data for any city in Nepal.
+Fetches CURRENT, live Air Quality Index (AQI) and weather data for ONE city in Nepal.
 
-Call this tool whenever the user asks about:
-- Air quality, air pollution, hawa (हावा), hawapani (हावापानी)
-- AQI or Air Quality Index
-- PM2.5 or PM10 or particulate matter
-- Smog, dust, pollution levels
-- Current weather: temperature, humidity, wind speed
-- Whether the air is safe to breathe or if they should wear a mask
-- Any question containing words: "air", "AQI", "pollution", "weather", "mausam (मौसम)", "hawa (हावा)", "taapkram (तापक्रम)"
+Call this tool when the user asks about live air quality or weather for a Nepali
+location, including implicit intent such as "can I go outside?", "should I wear a
+mask?", or "is it safe for children to play outside?".
 
-Returns: us_aqi, status_category, health_advice, pm2_5, pm10, temperature_celsius, relative_humidity_percent, wind_speed_kmh.
+Triggers include: air quality, air pollution, hawa (हावा), hawapani (हावापानी),
+AQI, PM2.5, PM10, particulate matter, smog, dust, pollution levels, weather,
+temperature, humidity, wind speed.
+
+If the user asks about MULTIPLE cities, call this tool once per city.
+
+DO NOT call this tool for definitions or explanations ("what does AQI mean?"),
+historical or seasonal trends, or future forecasts — it has no stored or forecast data.
+
+Returns only current values: us_aqi, status_category, health_advice, pm2_5, pm10,
+temperature_celsius, relative_humidity_percent, wind_speed_kmh. No precipitation data.
 `.trim(),
 	parameters: z.object({
 		location: z
