@@ -22,4 +22,19 @@
 			"previews_enabled": false
 		}
 	],
+	"queues": {
+    "producers": [
+      {
+        "queue": "whatsapp-queue",
+        "binding": "WHATSAPP_QUEUE"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "whatsapp-queue",
+        "max_batch_size": 1,
+        "max_batch_timeout": 5
+      }
+    ]
+  }
 }

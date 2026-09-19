@@ -5,6 +5,7 @@ import { sendFinalResponse, sendTypingIndicator } from "./wp";
 import { Embedder } from "./embedder";
 import { getRelevantDBRecords } from "./db";
 import { generateLLMResponse } from "./llm";
+import { processCustomer } from "./customer";
 
 export const verifyWebhook = (c: Context) => {
 	// verification token sent by wp api
@@ -49,6 +50,7 @@ export const processUserQuery = async (c: Context) => {
 		if (!userQuery || !messageId || !phoneNumberId || !fromNumber) {
 			return c.text("No query content found", 200);
 		}
+		await processCustomer({ userQuery, messageId, phoneNumberId, fromNumber });
 
 		console.log("Processed query:", {
 			userQuery,
