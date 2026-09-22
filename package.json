@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-		"deploy-and-tail": "wrangler deploy && wrangler tail",
+    "deploy-and-tail": "wrangler deploy && wrangler tail",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "@cloudflare/workers-types": "^5.20260904.1",
     "@types/bun": "^1.4.0",
     "drizzle-kit": "^1.0.0-rc.4",
+    "typescript": "^7.0.2",
     "wrangler": "^4.17.0"
   }
 }
